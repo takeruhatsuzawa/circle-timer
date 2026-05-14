@@ -789,6 +789,102 @@ function updateBg(f) {
 }
 
 // ═══════════════════════════════════════════
+// FAVICON + TAB TITLE
+// ═══════════════════════════════════════════
+const _fvCanvas = document.createElement('canvas');
+_fvCanvas.width = _fvCanvas.height = 128;
+const _fvCtx = _fvCanvas.getContext('2d');
+
+let _fvLink = document.querySelector("link[rel~='icon']");
+if (!_fvLink) {
+  _fvLink = document.createElement('link');
+  _fvLink.rel = 'icon';
+  document.head.appendChild(_fvLink);
+}
+
+let _fvLastSec = -1; // throttle: update only when second changes
+
+function drawFavicon(remainingMs, total, st) {
+  const S = 128, cx = 64, cy = 64, r = 50, sw = 14;
+  _fvCtx.clearRect(0, 0, S, S);
+
+  // Background circle
+  _fvCtx.beginPath();
+  _fvCtx.arc(cx, cy, 64, 0, Math.PI * 2);
+  _fvCtx.fillStyle = '#1C2E26';
+  _fvCtx.fill();
+
+  const frac    = (total > 0) ? Math.max(0, Math.min(1, remainingMs / total)) : 1;
+  const elapsed = 1 - frac;
+
+  // Track ring (dim)
+  _fvCtx.beginPath();
+  _fvCtx.arc(cx, cy, r, 0, Math.PI * 2);
+  _fvCtx.strokeStyle = 'rgba(255,255,255,0.14)';
+  _fvCtx.lineWidth = sw;
+  _fvCtx.stroke();
+
+  // Remaining arc: from elapsed_angle clockwise to 12 o'clock
+  const ringColor = st === 'done' ? '#E87B5A' : '#52D9A8';
+  if (frac > 0.001) {
+    _fvCtx.beginPath();
+    if (frac >= 0.999) {
+      _fvCtx.arc(cx, cy, r, -Math.PI / 2, Math.PI * 1.5, false);
+    } else {
+      const startAngle = -Math.PI / 2 + elapsed * 2 * Math.PI;
+      _fvCtx.arc(cx, cy, r, startAngle, -Math.PI / 2, false);
+    }
+    _fvCtx.strokeStyle = ringColor;
+    _fvCtx.lineWidth = sw;
+    _fvCtx.lineCap = 'round';
+    _fvCtx.stroke();
+  }
+
+  // Center label
+  let label;
+  if (st === 'done') {
+    label = '✓';
+    _fvCtx.font = 'bold 40px system-ui';
+  } else if (st === 'idle' || total <= 0) {
+    label = '◎';
+    _fvCtx.font = 'bold 30px system-ui';
+  } else {
+    const sec = Math.max(0, Math.ceil(remainingMs / 1000));
+    const m   = Math.floor(sec / 60);
+    const s   = sec % 60;
+    label = `${m}:${String(s).padStart(2, '0')}`;
+    _fvCtx.font = `bold ${label.length > 4 ? 22 : 26}px -apple-system, monospace`;
+  }
+
+  _fvCtx.fillStyle = '#FFFFFF';
+  _fvCtx.textAlign = 'center';
+  _fvCtx.textBaseline = 'middle';
+  _fvCtx.fillText(label, cx, cy + 1);
+
+  _fvLink.href = _fvCanvas.toDataURL('image/png');
+}
+
+function updateTab(remainingMs, total, st) {
+  const sec = Math.ceil(Math.max(0, remainingMs) / 1000);
+  if (sec === _fvLastSec && st !== 'done' && st !== 'idle') return; // throttle
+  _fvLastSec = sec;
+
+  drawFavicon(remainingMs, total, st);
+
+  // Tab title
+  if (st === 'idle') {
+    document.title = 'Circle Timer';
+  } else if (st === 'done') {
+    document.title = '✓ 完了 | Circle Timer';
+  } else {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    const prefix = st === 'paused' ? '⏸' : '⏱';
+    document.title = `${prefix} ${m}:${String(s).padStart(2,'0')} | Circle Timer`;
+  }
+}
+
+// ═══════════════════════════════════════════
 // TIMER STATE
 // ═══════════════════════════════════════════
 const timeText   = document.getElementById('timeText');
@@ -819,6 +915,7 @@ function tick(now) {
   const frac = remaining / totalMs;
   setRing(frac);
   updateBg(frac);
+  updateTab(remaining, totalMs, 'running');
   timeText.textContent = fmt(remaining);
   rafId = requestAnimationFrame(tick);
 }
@@ -829,6 +926,7 @@ function onDone() {
   wrap.classList.add('done');
   startBtn.textContent = 'もう一度';
   addSeconds(Math.round(totalMs / 1000));
+  updateTab(0, totalMs, 'done');
 }
 
 function startOrPause() {
@@ -848,10 +946,13 @@ function startOrPause() {
     baseMs += performance.now() - startTs;
     state = 'paused';
     startBtn.textContent = '再開';
+    const pausedRemaining = totalMs - baseMs;
+    updateTab(pausedRemaining, totalMs, 'paused');
 
   } else if (state === 'paused') {
     state = 'running';
     startBtn.textContent = '一時停止';
+    _fvLastSec = -1; // force redraw on resume
     rafId = requestAnimationFrame(ts => { startTs = ts; tick(ts); });
   }
 }
@@ -862,6 +963,8 @@ function reset() {
   wrap.classList.remove('done');
   startBtn.textContent = 'スタート';
   setRing(1); updateBg(1);
+  _fvLastSec = -1;
+  updateTab(0, 0, 'idle');
   const m = parseInt(minInput.value) || 0;
   const s = parseInt(secInput.value)  || 0;
   timeText.textContent = fmt((m * 60 + s) * 1000);
@@ -909,6 +1012,7 @@ secInput.addEventListener('input', () => {
 setRing(1);
 refreshPresetActive();
 renderTodayBox();
+updateTab(0, 0, 'idle');
 timeText.textContent = fmt(((parseInt(minInput.value)||0)*60+(parseInt(secInput.value)||0))*1000);
 </script>
 </body>
