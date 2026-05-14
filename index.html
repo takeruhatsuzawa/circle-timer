@@ -174,6 +174,54 @@
   .done #startBtn           { background: #A85A42; }
   .done .time-text          { color: #A85A42; }
   .done .preset-btn.active  { background: #A85A42; border-color: #A85A42; }
+
+  /* ── Total time ── */
+  .total-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 300px;
+    padding: 14px 20px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 16px;
+    border: 1px solid #DDD7CF;
+  }
+
+  .total-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .total-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #A89E96;
+    font-weight: 500;
+  }
+
+  .total-value {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 1px;
+    color: #2A2420;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .total-clear {
+    font-size: 11px;
+    color: #C4BDB5;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+    font-weight: 400;
+  }
+  .total-clear:hover  { color: #A85A42; opacity: 1; }
+  .total-clear:active { transform: none; }
 </style>
 </head>
 <body>
@@ -234,9 +282,58 @@
     </div>
 
   </div>
+
+  <!-- Total time -->
+  <div class="total-box">
+    <div class="total-left">
+      <span class="total-label">合計時間</span>
+      <span class="total-value" id="totalValue">0分</span>
+    </div>
+    <button class="total-clear" id="totalClear">クリア</button>
+  </div>
+
 </div>
 
 <script>
+  // ── Accumulated total (localStorage) ─────────────────────────
+  const STORAGE_KEY = 'circleTimerTotalSec';
+  const totalValueEl = document.getElementById('totalValue');
+  const totalClearEl = document.getElementById('totalClear');
+
+  function loadTotal() {
+    return parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+  }
+
+  function saveTotal(sec) {
+    localStorage.setItem(STORAGE_KEY, String(sec));
+  }
+
+  function fmtTotal(sec) {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0)  return `${h}時間 ${m}分`;
+    if (m > 0)  return `${m}分 ${s}秒`;
+    return `${s}秒`;
+  }
+
+  function renderTotal() {
+    totalValueEl.textContent = fmtTotal(loadTotal());
+  }
+
+  function addToTotal(ms) {
+    const sec = Math.round(ms / 1000);
+    saveTotal(loadTotal() + sec);
+    renderTotal();
+  }
+
+  totalClearEl.addEventListener('click', () => {
+    if (!confirm('合計時間をクリアしますか？')) return;
+    saveTotal(0);
+    renderTotal();
+  });
+
+  // ──────────────────────────────────────────────────────────────
   const CX = 150, CY = 150, R = 116;
   const ringEl     = document.getElementById('ring');
   const anchorDot  = document.getElementById('anchorDot');
@@ -326,6 +423,7 @@
     state = 'done';
     wrap.classList.add('done');
     startBtn.textContent = 'もう一度';
+    addToTotal(totalMs); // 完了したセッションを合計に加算
   }
 
   function startOrPause() {
@@ -416,6 +514,7 @@
   // Init
   setRing(1);
   refreshPresetActive();
+  renderTotal();
   timeText.textContent = fmt((parseInt(minInput.value) * 60 + parseInt(secInput.value)) * 1000);
 </script>
 </body>
