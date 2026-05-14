@@ -15,6 +15,7 @@
     background: #EDE8E1;
     font-family: -apple-system, 'Helvetica Neue', 'Hiragino Sans', sans-serif;
     color: #2A2420;
+    transition: background 1.2s ease;
   }
 
   .wrap {
@@ -284,6 +285,17 @@
     );
   }
 
+  // ── Background color ──────────────────────────────────────────
+  const BG_NORMAL = '#EDE8E1';
+  const BG_WARN   = '#F5EDD0'; // 残り25%：やわらかい黄
+  const BG_ALERT  = '#F0D5CC'; // 残り10%：やわらかい赤
+
+  function updateBg(fraction) {
+    const f = Math.max(0, fraction);
+    const bg = f <= 0.10 ? BG_ALERT : f <= 0.25 ? BG_WARN : BG_NORMAL;
+    if (document.body.style.background !== bg) document.body.style.background = bg;
+  }
+
   // ── Timer state ───────────────────────────────────────────────
   let totalMs = 0, startTs = null, baseMs = 0, rafId = null;
   let state = 'idle'; // idle | running | paused | done
@@ -302,7 +314,9 @@
       onDone();
       return;
     }
-    setRing(remaining / totalMs);
+    const frac = remaining / totalMs;
+    setRing(frac);
+    updateBg(frac);
     timeText.textContent = fmt(remaining);
     rafId = requestAnimationFrame(tick);
   }
@@ -346,6 +360,7 @@
     wrap.classList.remove('done');
     startBtn.textContent = 'スタート';
     setRing(1);
+    updateBg(1);
     const m = parseInt(minInput.value) || 0;
     const s = parseInt(secInput.value)  || 0;
     timeText.textContent = fmt((m * 60 + s) * 1000);
