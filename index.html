@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Circle Timer</title>
+<link rel="icon" type="image/png" id="dynamicFavicon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -793,16 +794,10 @@ function updateBg(f) {
 // ═══════════════════════════════════════════
 const _fvCanvas = document.createElement('canvas');
 _fvCanvas.width = _fvCanvas.height = 128;
-const _fvCtx = _fvCanvas.getContext('2d');
-
-let _fvLink = document.querySelector("link[rel~='icon']");
-if (!_fvLink) {
-  _fvLink = document.createElement('link');
-  _fvLink.rel = 'icon';
-  document.head.appendChild(_fvLink);
-}
-
-let _fvLastSec = -1; // throttle: update only when second changes
+const _fvCtx    = _fvCanvas.getContext('2d');
+const _fvLink   = document.getElementById('dynamicFavicon');
+let   _fvBlobUrl = null;
+let   _fvLastSec = -1;
 
 function drawFavicon(remainingMs, total, st) {
   const S = 128, cx = 64, cy = 64, r = 50, sw = 14;
@@ -824,7 +819,7 @@ function drawFavicon(remainingMs, total, st) {
   _fvCtx.lineWidth = sw;
   _fvCtx.stroke();
 
-  // Remaining arc: from elapsed_angle clockwise to 12 o'clock
+  // Remaining arc — start angle moves clockwise, same logic as main ring
   const ringColor = st === 'done' ? '#E87B5A' : '#52D9A8';
   if (frac > 0.001) {
     _fvCtx.beginPath();
@@ -835,33 +830,40 @@ function drawFavicon(remainingMs, total, st) {
       _fvCtx.arc(cx, cy, r, startAngle, -Math.PI / 2, false);
     }
     _fvCtx.strokeStyle = ringColor;
-    _fvCtx.lineWidth = sw;
-    _fvCtx.lineCap = 'round';
+    _fvCtx.lineWidth   = sw;
+    _fvCtx.lineCap     = 'round';
     _fvCtx.stroke();
   }
 
   // Center label
-  let label;
+  let label, fontSize;
   if (st === 'done') {
-    label = '✓';
-    _fvCtx.font = 'bold 40px system-ui';
+    label = '✓'; fontSize = 48;
   } else if (st === 'idle' || total <= 0) {
-    label = '◎';
-    _fvCtx.font = 'bold 30px system-ui';
+    label = ''; // idle: ring only, no text
   } else {
     const sec = Math.max(0, Math.ceil(remainingMs / 1000));
     const m   = Math.floor(sec / 60);
     const s   = sec % 60;
-    label = `${m}:${String(s).padStart(2, '0')}`;
-    _fvCtx.font = `bold ${label.length > 4 ? 22 : 26}px -apple-system, monospace`;
+    label    = `${m}:${String(s).padStart(2, '0')}`;
+    fontSize = label.length > 4 ? 22 : 27;
   }
 
-  _fvCtx.fillStyle = '#FFFFFF';
-  _fvCtx.textAlign = 'center';
-  _fvCtx.textBaseline = 'middle';
-  _fvCtx.fillText(label, cx, cy + 1);
+  if (label) {
+    _fvCtx.font         = `700 ${fontSize}px -apple-system, "Helvetica Neue", monospace`;
+    _fvCtx.fillStyle    = '#FFFFFF';
+    _fvCtx.textAlign    = 'center';
+    _fvCtx.textBaseline = 'middle';
+    _fvCtx.fillText(label, cx, cy + 1);
+  }
 
-  _fvLink.href = _fvCanvas.toDataURL('image/png');
+  // Use Blob URL (avoids potential data: CSP issues)
+  _fvCanvas.toBlob(blob => {
+    const newUrl = URL.createObjectURL(blob);
+    _fvLink.href = newUrl;
+    if (_fvBlobUrl) URL.revokeObjectURL(_fvBlobUrl);
+    _fvBlobUrl = newUrl;
+  }, 'image/png');
 }
 
 function updateTab(remainingMs, total, st) {
