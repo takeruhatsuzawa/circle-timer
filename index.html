@@ -13,7 +13,7 @@
     align-items: center;
     justify-content: center;
     background: #EDE8E1;
-    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    font-family: -apple-system, 'Helvetica Neue', 'Hiragino Sans', sans-serif;
     color: #2A2420;
   }
 
@@ -21,262 +21,289 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 36px;
+    gap: 32px;
   }
 
-  /* ---- Clock ---- */
+  /* ── Clock ── */
   .clock-outer {
     position: relative;
     width: 300px;
     height: 300px;
-    filter: drop-shadow(0 4px 18px rgba(0,0,0,0.10));
+    filter: drop-shadow(0 6px 24px rgba(0,0,0,0.09));
   }
 
-  #clockSvg {
-    width: 300px;
-    height: 300px;
-    overflow: visible;
-  }
+  #clockSvg { width: 300px; height: 300px; }
 
   .center-text {
     position: absolute;
     inset: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
     pointer-events: none;
   }
 
-  .time-display {
-    font-size: 48px;
-    font-weight: 300;
+  .time-text {
+    font-size: 54px;
+    font-weight: 200;
     letter-spacing: 2px;
     font-variant-numeric: tabular-nums;
-    line-height: 1;
-    transition: color 0.4s;
     color: #2A2420;
+    transition: color 0.4s;
   }
 
-  .status {
-    font-size: 10px;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: #9B948C;
-    font-weight: 500;
-  }
-
-  /* ---- Controls ---- */
+  /* ── Controls ── */
   .controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
+    width: 300px;
   }
 
-  .time-inputs {
+  /* Preset buttons */
+  .presets {
     display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #9B948C;
-    font-size: 13px;
+    gap: 8px;
+    width: 100%;
   }
 
-  .time-inputs input {
-    width: 62px;
-    padding: 8px 6px;
-    background: #FAF7F3;
-    border: 1px solid #DDD7CF;
-    border-radius: 10px;
+  .preset-btn {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 50px;
+    border: 1.5px solid #C4BDB5;
+    background: transparent;
+    color: #6A6059;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    transition: all 0.18s;
+  }
+  .preset-btn:hover {
+    border-color: #3E5A4C;
+    color: #3E5A4C;
+  }
+  .preset-btn.active {
+    background: #3E5A4C;
+    border-color: #3E5A4C;
+    color: #FAF7F3;
+  }
+
+  /* Custom time input — flat underline style */
+  .custom-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    color: #A89E96;
+    font-size: 12px;
+  }
+
+  .custom-row input {
+    width: 42px;
+    background: none;
+    border: none;
+    border-bottom: 1.5px solid #C4BDB5;
     color: #2A2420;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 300;
     text-align: center;
+    padding: 0 0 3px;
     outline: none;
-    transition: border-color 0.2s;
+    font-variant-numeric: tabular-nums;
     -moz-appearance: textfield;
+    transition: border-color 0.2s;
+  }
+  .custom-row input::-webkit-inner-spin-button,
+  .custom-row input::-webkit-outer-spin-button { display: none; }
+  .custom-row input:focus { border-color: #3E5A4C; }
+
+  .custom-row .unit {
+    font-size: 12px;
+    color: #A89E96;
+    padding-bottom: 5px;
+    margin-left: 1px;
+  }
+  .custom-row .colon {
+    font-size: 20px;
+    font-weight: 200;
+    color: #C4BDB5;
+    padding-bottom: 3px;
+    margin: 0 4px;
   }
 
-  .time-inputs input::-webkit-inner-spin-button,
-  .time-inputs input::-webkit-outer-spin-button { display: none; }
-
-  .time-inputs input:focus { border-color: #7A9E8A; }
-
-  .colon {
-    font-size: 22px;
-    font-weight: 300;
-    color: #BFB9B0;
-    margin: 0 2px;
+  /* Action buttons */
+  .actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
   }
 
-  .buttons { display: flex; gap: 10px; }
-
-  button {
-    padding: 10px 28px;
+  #startBtn {
+    flex: 1;
+    padding: 13px 0;
     border-radius: 50px;
     border: none;
-    font-size: 13px;
+    background: #3E5A4C;
+    color: #FAF7F3;
+    font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     letter-spacing: 0.5px;
+    transition: background 0.35s, opacity 0.15s, transform 0.1s;
+  }
+
+  #resetBtn {
+    padding: 13px 22px;
+    border-radius: 50px;
+    border: none;
+    background: #DDD7CF;
+    color: #5A524A;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
     transition: opacity 0.15s, transform 0.1s;
   }
 
   button:hover  { opacity: 0.82; }
   button:active { transform: scale(0.96); }
 
-  #startBtn {
-    background: #3E5A4C;
-    color: #FAF7F3;
-    min-width: 100px;
-    transition: background 0.4s;
-  }
-
-  #resetBtn {
-    background: #DDD7CF;
-    color: #5A524A;
-  }
-
-  /* done state */
-  .done #startBtn { background: #A85A42; }
-  .done .time-display { color: #A85A42; }
+  /* Done state */
+  .done #startBtn           { background: #A85A42; }
+  .done .time-text          { color: #A85A42; }
+  .done .preset-btn.active  { background: #A85A42; border-color: #A85A42; }
 </style>
 </head>
 <body>
 
 <div class="wrap" id="wrap">
+
+  <!-- Clock -->
   <div class="clock-outer">
     <svg id="clockSvg" viewBox="0 0 300 300">
       <!-- White face -->
-      <circle cx="150" cy="150" r="148" fill="#FDFAF6"/>
+      <circle cx="150" cy="150" r="148" fill="white"/>
 
-      <!-- Colored sector (remaining time, filled) -->
-      <path id="sector" fill="#3E5A4C"/>
+      <!-- Track ring (full circle, light) -->
+      <circle cx="150" cy="150" r="116"
+              fill="none" stroke="#E4DDD6" stroke-width="32"
+              transform="rotate(-90 150 150)"/>
 
-      <!-- Tick marks drawn by JS -->
-      <g id="ticks"></g>
+      <!-- Remaining ring (dynamic path) -->
+      <path id="ring"
+            fill="none" stroke="#3E5A4C" stroke-width="32"
+            stroke-linecap="round"/>
 
-      <!-- Thin border ring -->
+      <!-- 12 o'clock dot (fixed anchor) -->
+      <circle id="anchorDot" cx="150" cy="34" r="6" fill="#3E5A4C"/>
+
+      <!-- Subtle face border -->
       <circle cx="150" cy="150" r="148" fill="none" stroke="#DDD7CF" stroke-width="1"/>
-
-      <!-- Center hub -->
-      <circle cx="150" cy="150" r="22" fill="#FDFAF6" stroke="#DDD7CF" stroke-width="1"/>
-
-      <!-- Pointer line -->
-      <line id="pointer" x1="150" y1="150" x2="150" y2="4"
-            stroke="#FDFAF6" stroke-width="2.5" stroke-linecap="round"/>
     </svg>
 
     <div class="center-text">
-      <div class="time-display" id="timeDisplay">05:00</div>
-      <div class="status" id="status">準備完了</div>
+      <div class="time-text" id="timeText">05:00</div>
     </div>
   </div>
 
+  <!-- Controls -->
   <div class="controls">
-    <div class="time-inputs">
+
+    <!-- Preset buttons -->
+    <div class="presets">
+      <button class="preset-btn" data-min="10" data-sec="0">10分</button>
+      <button class="preset-btn" data-min="25" data-sec="0">25分</button>
+      <button class="preset-btn" data-min="60" data-sec="0">60分</button>
+    </div>
+
+    <!-- Custom input (flat underline) -->
+    <div class="custom-row">
       <input type="number" id="minInput" value="5" min="0" max="99" inputmode="numeric"/>
-      <label>分</label>
+      <span class="unit">分</span>
       <span class="colon">:</span>
       <input type="number" id="secInput" value="0" min="0" max="59" inputmode="numeric"/>
-      <label>秒</label>
+      <span class="unit">秒</span>
     </div>
-    <div class="buttons">
+
+    <!-- Action buttons -->
+    <div class="actions">
       <button id="startBtn">スタート</button>
       <button id="resetBtn">リセット</button>
     </div>
+
   </div>
 </div>
 
 <script>
-  const CX = 150, CY = 150, R = 126; // sector radius
-
-  // ---- Draw tick marks ----
-  const tickG = document.getElementById('ticks');
-  for (let i = 0; i < 60; i++) {
-    // Ticks go counterclockwise (matching Time Timer layout)
-    const angle = -Math.PI / 2 - (i / 60) * 2 * Math.PI;
-    const isMajor = i % 5 === 0;
-    const outerR = 140;
-    const innerR = isMajor ? 128 : 133;
-    const ln = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    ln.setAttribute('x1', CX + innerR * Math.cos(angle));
-    ln.setAttribute('y1', CY + innerR * Math.sin(angle));
-    ln.setAttribute('x2', CX + outerR * Math.cos(angle));
-    ln.setAttribute('y2', CY + outerR * Math.sin(angle));
-    ln.setAttribute('stroke', '#C8C2B8');
-    ln.setAttribute('stroke-width', isMajor ? '2' : '1');
-    ln.setAttribute('stroke-linecap', 'round');
-    tickG.appendChild(ln);
-  }
-
-  // ---- Sector drawing ----
-  const sectorEl  = document.getElementById('sector');
-  const pointerEl = document.getElementById('pointer');
-
-  function setSector(remainingFraction) {
-    const f = Math.max(0, Math.min(1, remainingFraction));
-    const elapsed = 1 - f;
-    const pAngle = -Math.PI / 2 + elapsed * 2 * Math.PI;
-    const px = CX + R * Math.cos(pAngle);
-    const py = CY + R * Math.sin(pAngle);
-
-    // Update pointer
-    pointerEl.setAttribute('x2', px);
-    pointerEl.setAttribute('y2', py);
-
-    if (f >= 0.9999) {
-      // Full circle: two semicircles
-      sectorEl.setAttribute('d',
-        `M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX} ${CY + R} A ${R} ${R} 0 1 1 ${CX} ${CY - R} Z`
-      );
-      pointerEl.setAttribute('x2', CX);
-      pointerEl.setAttribute('y2', CY - R);
-      return;
-    }
-    if (f <= 0.0001) {
-      sectorEl.setAttribute('d', '');
-      pointerEl.setAttribute('x2', CX);
-      pointerEl.setAttribute('y2', CY - R);
-      return;
-    }
-
-    // Arc from pointer position, clockwise, to 12 o'clock
-    const largeArc = f > 0.5 ? 1 : 0;
-    sectorEl.setAttribute('d',
-      `M ${CX} ${CY} L ${px} ${py} A ${R} ${R} 0 ${largeArc} 1 ${CX} ${CY - R} Z`
-    );
-  }
-
-  // ---- Timer state ----
-  const timeDisplay = document.getElementById('timeDisplay');
-  const statusEl   = document.getElementById('status');
+  const CX = 150, CY = 150, R = 116;
+  const ringEl     = document.getElementById('ring');
+  const anchorDot  = document.getElementById('anchorDot');
+  const timeText   = document.getElementById('timeText');
   const startBtn   = document.getElementById('startBtn');
   const resetBtn   = document.getElementById('resetBtn');
   const minInput   = document.getElementById('minInput');
   const secInput   = document.getElementById('secInput');
   const wrap       = document.getElementById('wrap');
+  const presetBtns = document.querySelectorAll('.preset-btn');
 
+  // ── Ring drawing ──────────────────────────────────────────────
+  // 右回転: elapsed area grows clockwise from 12.
+  // Ring (remaining) goes from [elapsed_angle] clockwise to 12 o'clock.
+  // As elapsed grows, elapsed_angle moves clockwise → ring start moves clockwise.
+
+  function setRing(remainingFraction) {
+    const f       = Math.max(0, Math.min(1, remainingFraction));
+    const elapsed = 1 - f;
+    // Angle of the ring's start (pointer): clockwise from 12 o'clock
+    const pAngle  = -Math.PI / 2 + elapsed * 2 * Math.PI;
+    const px      = CX + R * Math.cos(pAngle);
+    const py      = CY + R * Math.sin(pAngle);
+    const ex      = CX;      // 12 o'clock x
+    const ey      = CY - R;  // 12 o'clock y
+
+    // Update anchor dot visibility
+    anchorDot.style.opacity = f > 0.001 ? '1' : '0';
+
+    if (f >= 0.9999) {
+      // Full circle: two semicircles
+      ringEl.setAttribute('d',
+        `M ${CX} ${CY - R} A ${R} ${R} 0 1 1 ${CX} ${CY + R} A ${R} ${R} 0 1 1 ${CX} ${CY - R}`
+      );
+      return;
+    }
+    if (f <= 0.0001) {
+      ringEl.setAttribute('d', '');
+      return;
+    }
+
+    // Arc from pointer (clockwise from 12) → 12 o'clock, going clockwise
+    const largeArc = f > 0.5 ? 1 : 0;
+    ringEl.setAttribute('d',
+      `M ${px} ${py} A ${R} ${R} 0 ${largeArc} 1 ${ex} ${ey}`
+    );
+  }
+
+  // ── Timer state ───────────────────────────────────────────────
   let totalMs = 0, startTs = null, baseMs = 0, rafId = null;
   let state = 'idle'; // idle | running | paused | done
 
   function fmt(ms) {
     const t = Math.ceil(Math.max(0, ms) / 1000);
-    return `${String(Math.floor(t / 60)).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+    return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
   }
 
   function tick(now) {
     const elapsed   = baseMs + (now - startTs);
     const remaining = totalMs - elapsed;
     if (remaining <= 0) {
-      setSector(0);
-      timeDisplay.textContent = '00:00';
+      setRing(0);
+      timeText.textContent = '00:00';
       onDone();
       return;
     }
-    setSector(remaining / totalMs);
-    timeDisplay.textContent = fmt(remaining);
+    setRing(remaining / totalMs);
+    timeText.textContent = fmt(remaining);
     rafId = requestAnimationFrame(tick);
   }
 
@@ -284,7 +311,6 @@
     cancelAnimationFrame(rafId);
     state = 'done';
     wrap.classList.add('done');
-    statusEl.textContent = '完了！';
     startBtn.textContent = 'もう一度';
   }
 
@@ -298,8 +324,7 @@
       baseMs = 0;
       state  = 'running';
       startBtn.textContent = '一時停止';
-      statusEl.textContent = '計測中';
-      setSector(1);
+      setRing(1);
       rafId = requestAnimationFrame(ts => { startTs = ts; tick(ts); });
 
     } else if (state === 'running') {
@@ -307,12 +332,10 @@
       baseMs += performance.now() - startTs;
       state = 'paused';
       startBtn.textContent = '再開';
-      statusEl.textContent = '一時停止中';
 
     } else if (state === 'paused') {
       state = 'running';
       startBtn.textContent = '一時停止';
-      statusEl.textContent = '計測中';
       rafId = requestAnimationFrame(ts => { startTs = ts; tick(ts); });
     }
   }
@@ -322,28 +345,63 @@
     baseMs = 0; startTs = null; state = 'idle';
     wrap.classList.remove('done');
     startBtn.textContent = 'スタート';
-    statusEl.textContent = '準備完了';
-    setSector(1);
+    setRing(1);
     const m = parseInt(minInput.value) || 0;
     const s = parseInt(secInput.value)  || 0;
-    timeDisplay.textContent = fmt((m * 60 + s) * 1000);
+    timeText.textContent = fmt((m * 60 + s) * 1000);
   }
 
-  function onInputChange() {
-    if (state !== 'idle') return;
+  function applyTime(min, sec) {
+    minInput.value = min;
+    secInput.value = sec;
+    if (state === 'idle') {
+      timeText.textContent = fmt((min * 60 + sec) * 1000);
+      setRing(1);
+    }
+    refreshPresetActive();
+  }
+
+  function refreshPresetActive() {
     const m = parseInt(minInput.value) || 0;
     const s = parseInt(secInput.value)  || 0;
-    timeDisplay.textContent = fmt((m * 60 + s) * 1000);
+    presetBtns.forEach(btn => {
+      const match = parseInt(btn.dataset.min) === m && parseInt(btn.dataset.sec) === s;
+      btn.classList.toggle('active', match);
+    });
   }
 
   startBtn.addEventListener('click', startOrPause);
   resetBtn.addEventListener('click', reset);
-  minInput.addEventListener('input', onInputChange);
-  secInput.addEventListener('input', onInputChange);
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyTime(parseInt(btn.dataset.min), parseInt(btn.dataset.sec));
+      if (state !== 'idle') reset();
+    });
+  });
+
+  minInput.addEventListener('input', () => {
+    if (state === 'idle') {
+      const m = parseInt(minInput.value) || 0;
+      const s = parseInt(secInput.value)  || 0;
+      timeText.textContent = fmt((m * 60 + s) * 1000);
+      refreshPresetActive();
+    }
+  });
+
+  secInput.addEventListener('input', () => {
+    if (state === 'idle') {
+      const m = parseInt(minInput.value) || 0;
+      const s = parseInt(secInput.value)  || 0;
+      timeText.textContent = fmt((m * 60 + s) * 1000);
+      refreshPresetActive();
+    }
+  });
 
   // Init
-  setSector(1);
-  onInputChange();
+  setRing(1);
+  refreshPresetActive();
+  timeText.textContent = fmt((parseInt(minInput.value) * 60 + parseInt(secInput.value)) * 1000);
 </script>
 </body>
 </html>
