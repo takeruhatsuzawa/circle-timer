@@ -396,6 +396,22 @@ setInterval(() => {
   if (timerState === 'running' || swState === 'running') renderTodayBox();
 }, 1000);
 
+// Keep tab title + favicon alive when RAF is throttled by the browser (tab hidden)
+setInterval(() => {
+  if (!document.hidden) return;
+  if (currentMode === 'timer' && timerState === 'running') {
+    const remaining = totalMs - (baseMs + (performance.now() - startTs));
+    updateTab(Math.max(0, remaining), totalMs, 'running');
+  } else if (currentMode === 'stopwatch' && swState === 'running') {
+    updateTab(swBaseMs + (performance.now() - swStartTs), -1, 'sw-running');
+  }
+}, 1000);
+
+// Force favicon redraw when the user returns to the tab
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) _fvLastSec = -1;
+});
+
 document.getElementById('todayClear').addEventListener('click', () => {
   if (!confirm('今日の学習記録をクリアしますか？')) return;
   clearToday();
