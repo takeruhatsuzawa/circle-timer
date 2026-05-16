@@ -652,10 +652,10 @@ function updateTab(ms, total, st) {
   if (sec === _fvLastSec && st !== 'done' && st !== 'idle') return;
   _fvLastSec = sec; drawFavicon(ms, total, st);
   if (st === 'idle') { document.title = 'Circle Timer'; return; }
-  if (st === 'done') { document.title = '✓ 完了 | Circle Timer'; return; }
+  if (st === 'done') { document.title = '✓ 完了'; return; }
   const m = Math.floor(sec / 60), s = sec % 60;
-  const prefix = (st === 'paused' || st === 'sw-paused') ? '⏸' : '⏱';
-  document.title = `${prefix} ${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')} | Circle Timer`;
+  const prefix = (st === 'paused' || st === 'sw-paused') ? '⏸ ' : '';
+  document.title = `${prefix}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
 // ═══════════════════════════════════
